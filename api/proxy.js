@@ -27,6 +27,15 @@ function allowedHost(host) {
   return allow.some(s => h === s || h.endsWith('.' + s));
 }
 
+// 按平台给上游正确的 Referer（抖音播放接口不带正确 Referer 会 403）
+function refererFor(u) {
+  const h = new URL(u).hostname.toLowerCase();
+  if (/douyin|iesdouyin|douyinvod|bytecdn|volcdn/.test(h)) return 'https://www.douyin.com/';
+  if (/kuaishou|gifshow|kuaishouvod/.test(h)) return 'https://www.kuaishou.com/';
+  if (/xiaohongshu|xhscdn/.test(h)) return 'https://www.xiaohongshu.com/';
+  return new URL(u).origin + '/';
+}
+
 export default async function handler(req, res) {
   const url = (req.query && req.query.url) || '';
   if (!url) { res.statusCode = 400; res.end('missing url'); return; }
@@ -35,7 +44,7 @@ export default async function handler(req, res) {
   if (!allowedHost(host)) { res.statusCode = 403; res.end('host not allowed'); return; }
 
   try {
-    const r = await fetch(url, { headers: { 'User-Agent': UA, 'Referer': new URL(url).origin + '/' } });
+    const r = await fetch(url, { headers: { 'User-Agent': UA, 'Referer': refererFor(url) } });
     if (!r.ok) { res.statusCode = r.status; res.end('upstream ' + r.status); return; }
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Content-Type', r.headers.get('content-type') || 'video/mp4');
