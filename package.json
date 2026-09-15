@@ -1,0 +1,10 @@
+{
+  "name": "video-parser",
+  "version": "1.0.0",
+  "private": true,
+  "description": "短视频分享链接解析 + CORS 视频代理（从 GitHub 一键部署到 Vercel）",
+  "type": "module",
+  "scripts": {
+    "start": "vercel dev"
+  }
+}
