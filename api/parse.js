@@ -7,7 +7,7 @@
 // 依赖当前页面内嵌 JSON。若某天失效，只需替换 resolve() 里的抽取逻辑，接口不变。
 // 仅用于解析你自己有权处理的素材；请遵守各平台服务条款与当地法规。
 
-export const config = { runtime: 'nodejs20.x' };
+export const config = { runtime: 'nodejs' };
 
 const UA = 'Mozilla/5.0 (iPhone; CPU iPhone OS 16_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.0 Mobile/15E148 Safari/604.1';
 
