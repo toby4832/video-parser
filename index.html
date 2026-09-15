@@ -1,0 +1,762 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-page-node-id="2OhUY0cV8VbNajOy6QtULD">
+<head data-page-node-id="floQCbg9IoKrCRok0SM11F">
+<meta charset="UTF-8" data-page-node-id="jWWHDqXmrKFZCmOllujHfA" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" data-page-node-id="NUsucp4yoznljZ4fgKBetE" />
+<title>素材替换工作台 · 雏形（免费 / 浏览器端）</title>
+<style>
+  :root{
+    --bg:#f7f8fa; --panel:#ffffff; --line:#e5e7eb; --line2:#d1d5db;
+    --txt:#1f2937; --mut:#6b7280; --accent:#534ab7; --accent2:#3b6d11;
+    --warn:#854f0b; --radius:12px;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;
+    background:var(--bg);color:var(--txt);font-size:14px;}
+  header{display:flex;align-items:center;gap:10px;padding:12px 18px;background:var(--panel);
+    border-bottom:1px solid var(--line);position:sticky;top:0;z-index:10;}
+  header .logo{width:28px;height:28px;border-radius:8px;background:var(--accent);color:#fff;
+    display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;}
+  header h1{font-size:15px;margin:0;font-weight:600;}
+  header .tag{font-size:11px;color:var(--mut);border:1px solid var(--line2);padding:2px 8px;border-radius:20px;}
+  .wrap{display:flex;min-height:calc(100vh - 53px);}
+  nav{width:188px;background:var(--panel);border-right:1px solid var(--line);padding:14px 10px;flex-shrink:0;}
+  nav .step{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:10px;cursor:pointer;margin-bottom:4px;color:var(--mut);}
+  nav .step .n{width:22px;height:22px;border-radius:50%;background:var(--line);color:var(--mut);
+    display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0;}
+  nav .step.active{background:#eef2ff;color:var(--accent);font-weight:600;}
+  nav .step.active .n{background:var(--accent);color:#fff;}
+  nav .hint{font-size:11px;color:var(--mut);margin-top:14px;line-height:1.6;padding:0 12px;}
+  main{flex:1;padding:18px 22px;overflow:auto;}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:16px 18px;margin-bottom:16px;}
+  .card h2{font-size:14px;margin:0 0 4px;font-weight:600;}
+  .card p.desc{font-size:12px;color:var(--mut);margin:0 0 12px;line-height:1.6;}
+  .hidden{display:none!important;}
+  .stage{display:flex;gap:18px;align-items:flex-start;}
+  .canvas-box{flex:1;background:#111;border-radius:10px;overflow:hidden;min-height:320px;
+    display:flex;align-items:center;justify-content:center;position:relative;}
+  canvas{max-width:100%;max-height:70vh;display:block;touch-action:none;cursor:crosshair;}
+  .placeholder{color:#9ca3af;font-size:13px;padding:40px;text-align:center;}
+  .side{width:300px;flex-shrink:0;}
+  label{display:block;font-size:12px;color:var(--mut);margin:10px 0 4px;}
+  input[type=text],input[type=number],textarea,select{width:100%;padding:8px 10px;border:1px solid var(--line2);
+    border-radius:8px;font-size:13px;font-family:inherit;background:#fff;color:var(--txt);}
+  textarea{resize:vertical;min-height:64px;}
+  input[type=range]{width:100%;}
+  button{font-family:inherit;font-size:13px;border:1px solid var(--line2);background:#fff;color:var(--txt);
+    padding:8px 14px;border-radius:8px;cursor:pointer;margin:4px 4px 4px 0;}
+  button.primary{background:var(--accent);border-color:var(--accent);color:#fff;}
+  button.green{background:var(--accent2);border-color:var(--accent2);color:#fff;}
+  button.warn{background:var(--warn);border-color:var(--warn);color:#fff;}
+  button:hover{opacity:.9;}
+  button:disabled{opacity:.5;cursor:not-allowed;}
+  .row{display:flex;gap:8px;align-items:center;flex-wrap:wrap;}
+  .pill{display:inline-block;font-size:11px;padding:2px 8px;border-radius:20px;background:#eef2ff;color:var(--accent);margin-right:6px;}
+  .pill.free{background:#eaf3de;color:var(--accent2);}
+  .pill.byok{background:#faedda;color:var(--warn);}
+  .list{font-size:12px;color:var(--mut);line-height:1.9;}
+  .list .obj{display:flex;align-items:center;gap:8px;padding:6px 8px;border:1px solid var(--line);border-radius:8px;margin-bottom:6px;cursor:pointer;}
+  .list .obj:hover{border-color:var(--accent);}
+  .status{font-size:12px;color:var(--mut);margin-top:8px;min-height:18px;}
+  .drop{border:2px dashed var(--line2);border-radius:12px;padding:30px;text-align:center;color:var(--mut);cursor:pointer;}
+  .drop:hover{border-color:var(--accent);color:var(--accent);}
+  .kv{font-size:12px;color:var(--mut);}
+  video.hidden-video{display:none;}
+  .seg{display:flex;gap:6px;margin:6px 0;}
+  .seg button{flex:1;margin:0;}
+  .seg button.on{background:var(--accent);color:#fff;border-color:var(--accent);}
+  .small{font-size:11px;color:var(--mut);}
+</style>
+</head>
+<body data-page-node-id="0hbsKRiUb4mwLwCDH1OUwp">
+<header data-page-node-id="e1hLucohNqY9ddoIcYvtOv">
+  <div class="logo" data-page-node-id="m0N3sxSznHvMVmtUvgZNz7">R</div>
+  <h1 data-page-node-id="bQTzcUqlvPvITBmPOKHjMe">素材替换工作台</h1>
+  <span class="tag" data-page-node-id="3iX9bX7LeLLiyNhlmvsjvB">雏形 · 浏览器端免费 · 零服务器</span>
+</header>
+
+<div class="wrap" data-page-node-id="zSc4RYcEBFIomRfFfmENgW">
+  <nav data-page-node-id="vynzpqW0MbUzcSqkmbYDam">
+    <div class="step active" data-step="1" data-page-node-id="AVHOjhrvJIG7aib03Mlke6"><span class="n" data-page-node-id="R0lxy40cbHfF1iQ4SBeYzo">1</span>导入</div>
+    <div class="step" data-step="2" data-page-node-id="ADoHB8wjdug970JijGh710"><span class="n" data-page-node-id="DhgePWjxlTRrRE8ULQn5gw">2</span>解析</div>
+    <div class="step" data-step="3" data-page-node-id="4EtcyuilsAr853EAnCECw5"><span class="n" data-page-node-id="v1fq6IH77CteroNdzAgNbP">3</span>选择</div>
+    <div class="step" data-step="4" data-page-node-id="icvqGR3rbgNE5sY5XZzohV"><span class="n" data-page-node-id="xOE8UoxkFTmyTi3cSdCKoo">4</span>几何替换</div>
+    <div class="step" data-step="5" data-page-node-id="z2DZVgu5iQnGSXkqFQosSX"><span class="n" data-page-node-id="jCL7YHUxExJhvNJsbCE1HU">5</span>声音</div>
+    <div class="step" data-step="6" data-page-node-id="v3VZ1FYel44DmSQNeI30gm"><span class="n" data-page-node-id="QNj5K2nU6pkF06SPaefy2m">6</span>文案</div>
+    <div class="step" data-step="7" data-page-node-id="2lRzLImJb3VN9r7Zeh5vww"><span class="n" data-page-node-id="3DC8VsKQYeD2fz20PXKkNb">7</span>导出</div>
+    <div class="hint" data-page-node-id="df15q1WCZCupHOwUX4WIvi">默认路径全在浏览器跑，成本 ¥0。<br data-page-node-id="5pzXVRiW0WoKsNMuYnd8q2">AI 重绘为 BYOK 可选项（填自己的 Key）。<br data-page-node-id="3GnC1HzD6PcCC8FvaRzzTF">人物/人脸替换 V2 再做。</div>
+  </nav>
+
+  <main data-page-node-id="fSY111kNieDHlaeFNUad0g">
+    <!-- STEP 1 导入 -->
+    <section id="step1" data-page-node-id="LI4bb6tfYNxOuoryLjyhhG">
+      <div class="card" data-page-node-id="0HRpcKoKktJ9TPrf2A9nBO">
+        <h2 data-page-node-id="DITpVORW91pFu6C9wIQEp2">① 导入素材 <span class="pill free" data-page-node-id="xNse5WtLAGA6NL8AI2ST2D">免费</span></h2>
+        <p class="desc" data-page-node-id="UvXkgbRHpYPvzT1bqftBQu">上传本地视频/图片，或粘贴一条视频链接直接解析复刻。视频会自动抽帧作为编辑基准。</p>
+        <div class="seg" style="max-width:320px;">
+          <button id="srcLocal" class="on">本地文件</button>
+          <button id="srcLink">视频链接</button>
+        </div>
+        <div id="localPane">
+          <div class="drop" id="drop" data-page-node-id="VxU0UdkEeiOQ3chPJORHIx">点击或拖拽上传 视频 / 图片</div>
+          <input type="file" id="fileInput" accept="video/*,image/*" class="hidden" data-page-node-id="z9VfKkbvDvTE7dOpgu7FI8" />
+        </div>
+        <div id="linkPane" class="hidden">
+          <label>视频链接（抖音 / 快手 / 小红书 / 视频号，或直接可播放的 mp4 直链）</label>
+          <textarea id="urlInput" placeholder="粘贴视频分享链接，例如 https://v.douyin.com/xxxx/ 或 https://cdn.example.com/clip.mp4"></textarea>
+          <div class="row">
+            <button id="btnParse" class="primary">解析并加载</button>
+            <span class="pill" id="linkPlatHint">平台：自动识别</span>
+          </div>
+          <label>解析 / 代理服务地址（部署后的域名，例如 https://video-parser-xxx.vercel.app）</label>
+          <input type="text" id="parserUrl" placeholder="留空=用当前站点（已部署时无需填）" title="部署到 Vercel 后留空即可（自动用当前站点同源解析+代理）；本地双击打开时才需填部署域名。" />
+          <div class="small">说明：抖音 / 快手 / 小红书 / 视频号 的分享链接带反爬与签名，浏览器无法直接抓取，需经你的解析/代理服务（GitHub 仓库 → Vercel 一键部署，免费）拿到直链并转发视频；若是平台公开 CDN 的 mp4 直链，不填也可直接加载（需对方允许跨域，否则只能播放、不能逐帧编辑）。</div>
+        </div>
+        <div class="row" id="importInfo" style="margin-top:10px;" data-page-node-id="GNZgFigv0H9AuK4ZHedCu5"></div>
+      </div>
+      <div class="card" data-page-node-id="qGcox9dKaRkBLiX6Oyjono">
+        <h2 data-page-node-id="Db8P4rJBhF6J4OGiaqJpXq">平台预设</h2>
+        <p class="desc" data-page-node-id="HObbU2GGX1hJHZ51IuSQDZ">选择目标平台，决定默认导出比例与标题话题模板（导出步骤会用到）。</p>
+        <div class="row" data-page-node-id="YtLFUkzPW9zmEa0wPDqoc1">
+          <button class="plat on" data-plat="douyin" data-page-node-id="DrZ7W80rPfWfleUJ09EXs8">抖音</button>
+          <button class="plat" data-plat="kuaishou" data-page-node-id="kW8X6SQHuTkLIYG2uGV5c6">快手</button>
+          <button class="plat" data-plat="xhs" data-page-node-id="7uTK4VXWtWskikxm6wMLVn">小红书</button>
+          <button class="plat" data-plat="shipinhao" data-page-node-id="iz2pecIcdZBPJac0eBP0DQ">视频号</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- STEP 2 解析 -->
+    <section id="step2" class="hidden" data-page-node-id="dhWVuJfLtbmvZmRIqbPWWK">
+      <div class="card" data-page-node-id="OVwcAGbYALXZwEYqHcUMiN">
+        <h2 data-page-node-id="WRUCyhoNROUJKuAcsLcKh0">② 解析拆层 <span class="pill free" data-page-node-id="5DxbDhJWwQp5yG0XQTvwwS">免费</span></h2>
+        <p class="desc" data-page-node-id="rNRwdD2vf4hUjdDXGT9VW2">解析你要复刻的视频：先抽关键帧看清镜头结构，再点候选框选要替换的对象（演示用启发式框选；接 SAM2 + 带货词表后升级为真实检测）。</p>
+        <div class="row" data-page-node-id="WLeiDjJdCraH57cyUIj9iw">
+          <button class="primary" id="btnDetect" data-page-node-id="o7XWfcWhVXctQ7BH6uFflY">自动检测候选（演示）</button>
+          <button id="btnKeyframes">抽取关键帧（解析镜头）</button>
+        </div>
+        <div class="list" id="objList" style="margin-top:10px;" data-page-node-id="cCVtGeTFflMprhUh26be4U"></div>
+        <hr style="border:none;border-top:1px solid var(--line);margin:14px 0;" />
+        <div class="small">抽取关键帧：把视频按时间均匀采样若干帧，作为可复刻的镜头参考。点任一帧即可载入编辑。</div>
+        <div class="row" id="kfRow" style="margin-top:8px;"></div>
+      </div>
+    </section>
+
+    <!-- STEP 3 选择 -->
+    <section id="step3" class="hidden" data-page-node-id="K3U2htoAh4Y9NqAq6Gwicn">
+      <div class="card" data-page-node-id="ArOPrmeAg0dN0KIOzleDgM">
+        <h2 data-page-node-id="YeDbu8qgZEksClkD1kXwyQ">③ 选择替换对象 <span class="pill free" data-page-node-id="LSVb5nZjs62F0KtvVVkAaY">免费</span></h2>
+        <p class="desc" data-page-node-id="BemkYfLG5fLCx1SipeVahi">在画面上按住拖拽框选要替换的区域；也可用画笔涂抹。框选后可在第 4 步做几何替换，或作为「换背景时的前景区域」。</p>
+        <div class="seg" data-page-node-id="IH0VVCfCqHUmLeMBtFTHpy">
+          <button id="toolBox" class="on" data-page-node-id="QOkpoV1DpsLm7m0zWs0WLi">矩形框选</button>
+          <button id="toolBrush" data-page-node-id="DheiAybAvrtmYhPVE97e8B">画笔涂抹</button>
+        </div>
+        <div class="row" data-page-node-id="aGIi3d2NRVXNXrz4JZI4it">
+          <button id="btnUseFg" data-page-node-id="eMvLrbOTODauGngRuUIvIR">设为前景区域（换背景用）</button>
+          <button id="btnClearSel" data-page-node-id="jwYS7QJqcG0I7B2OJSEfZT">清除选区</button>
+        </div>
+        <div class="status" id="selStatus" data-page-node-id="G6zYYAl93mDbkU1AqFxiiA">尚未框选。</div>
+      </div>
+    </section>
+
+    <!-- STEP 4 替换 -->
+    <section id="step4" class="hidden" data-page-node-id="bF2v6heyxd9bcMoo3VNeC2">
+      <div class="card" data-page-node-id="bXPU9M8SmUNh5cNgt8yLHR">
+        <h2 data-page-node-id="HGTAKSGYN96BvH1FYsMMwt">④ 几何替换 <span class="pill free" data-page-node-id="1syNr1PkVMm5MltcyDGVJe">免费</span></h2>
+        <p class="desc" data-page-node-id="UJooqtpZKFoyttQKSVVC5P">零 AI 成本的替换方式：上传透明底产品 PNG 摆放到位，或上传新背景把前景区域叠上去。</p>
+        <label data-page-node-id="1UEOhBiAU7KArmPa3NpRbv">上传产品图（透明底 PNG，覆盖到画面）</label>
+        <input type="file" id="productInput" accept="image/png,image/*" data-page-node-id="ONTIiDuxlABjgb7WqlDfD3" />
+        <div class="row" data-page-node-id="szugkQMSmuXTlRyW7m4Idu">
+          <button id="btnFitSel" data-page-node-id="9buRpKNaz93iMDNSpFqolc">贴合选区</button>
+          <button id="btnProductClear" data-page-node-id="QkMBIOB1AVKYUcTFJiVCCj">移除产品</button>
+        </div>
+        <label data-page-node-id="bKBp3YBgPi7ZqCGBHi6vb4">缩放 <span id="scaleVal" data-page-node-id="cGbfbvgaG0eF5sCwxT3rcd">100%</span></label>
+        <input type="range" id="scale" min="20" max="300" value="100" data-page-node-id="zqwN7bGhouAfICIpOXqlMU" />
+        <label data-page-node-id="XpIieCVOGrNYprbI3HUzzb">旋转 <span id="rotVal" data-page-node-id="Act5ej0x5FBb7YbICWr4C0">0°</span></label>
+        <input type="range" id="rot" min="-180" max="180" value="0" data-page-node-id="oUNsV6GE6RFDaWUyebhNx2" />
+        <label data-page-node-id="6dqdkJK5F0EyKV5Y7miWra">上传新背景图（替换原背景）</label>
+        <input type="file" id="bgInput" accept="image/*" data-page-node-id="lYEybHQUE9oBpeLtwwAU7Q" />
+        <div class="row" data-page-node-id="OouYf8SfnI8jxMKRoP7YvA">
+          <button id="btnBgClear" data-page-node-id="TGD7SND2tMt4ljehK6fdXO">移除背景</button>
+        </div>
+        <div class="small" data-page-node-id="fWkaDasr3clT4pYEB8kYcp">提示：拖动画面上的产品可移动位置。换背景时，第 3 步框选的区域会作为前景保留。</div>
+      </div>
+
+      <div class="card" data-page-node-id="xnuY2YE4670EREPS439uIo">
+        <h2 data-page-node-id="OEObo5PSYPRyFg1JInszKn">AI 替换 <span class="pill byok" data-page-node-id="k3GWTg5ipRhBXIQRp0hNYF">BYOK · 可选项</span></h2>
+        <p class="desc" data-page-node-id="TaGd6lOPitegyZZxzirybH">需要更真实的材质/光影重绘时才用。填入你自己的模型 API Key，调用走 Cloudflare Worker 代理（你自费，不消耗本站资源）。</p>
+        <label data-page-node-id="sdHJuWr2PVLYfc06h5utbQ">API Key（硅基流动 / 百炼 / 火山，自行保管）</label>
+        <input type="text" id="apiKey" placeholder="sk-...（仅存浏览器本地）" data-page-node-id="MIEGZbqpnHKcu2ssgAEtuw" />
+        <label data-page-node-id="pHvAfqCySmQ1uOo7f5j8KI">替换提示词</label>
+        <textarea id="aiPrompt" placeholder="例如：把瓶身换成磨砂玻璃质感，暖光从左上打光"></textarea>
+        <div class="row" data-page-node-id="aoJyW2eB41YL6ZDJPtXrUD">
+          <button id="btnAiReplace" class="warn" data-page-node-id="bGfrKHskIbnt9XWqzj1VCw">发起 AI 重绘（需自建 Worker）</button>
+        </div>
+        <div class="status" id="aiStatus" data-page-node-id="OfeGUdqtASvsFJFsYNiAyt">BYOK 接口已预留，需配套 Worker 代理才能真实调用（V1 不内置）。</div>
+      </div>
+    </section>
+
+    <!-- STEP 5 声音 -->
+    <section id="step5" class="hidden" data-page-node-id="4CLDgLDj7u2BhLkbVlhwMG">
+      <div class="card" data-page-node-id="zY3AfMXXtGA7vWpVyKsYeR">
+        <h2 data-page-node-id="VhXWoIpXeCgxNhc89ASqUc">⑤ 声音 <span class="pill free" data-page-node-id="E5rnqUhTRy7LzMv2uAjzYQ">免费</span> / <span class="pill byok" data-page-node-id="WSwLPf55YET82hJowSzC9h">BYOK</span></h2>
+        <p class="desc" data-page-node-id="lmwqRFsmEkvCUpE5Ww9UZ1">免费方案用浏览器原生 Web Speech 试听配音；要导出音轨请上传自己的录音文件。音色克隆（BYOK）放后续。</p>
+        <label data-page-node-id="BsH3wVFQyK3M4rucBnK1qn">配音文案</label>
+        <textarea id="ttsText" placeholder="输入要念的口播文案，多语种均可"></textarea>
+        <label data-page-node-id="BscoAajUVvKuPuDpmJLcb9">语种 / 音色</label>
+        <div class="row" data-page-node-id="G4G0NSavE0DtOETRnaQv8B">
+          <select id="ttsLang" style="width:auto;" data-page-node-id="9n2d2HudhqAVot3J8vF8sw"></select>
+          <select id="ttsVoice" style="width:auto;flex:1;" data-page-node-id="uAs5vmKYGgbAUhXNqVVwTL"></select>
+        </div>
+        <div class="row" data-page-node-id="rpSx8htBOYZESgeK1YwAvc">
+          <button id="btnTts" class="green" data-page-node-id="iRiYlPKr3hYbZ5HK51QkNL">试听配音（免费）</button>
+          <button id="btnTtsStop" data-page-node-id="KmZ2VDOssPgVXVLCQEUfGq">停止</button>
+        </div>
+        <label data-page-node-id="PAMRdAMkDH6qAt1w4S8tkR">或上传配音音轨（用于导出）</label>
+        <input type="file" id="voInput" accept="audio/*" data-page-node-id="Tj9FnQdfBcSUz1tJNMCe3g" />
+        <div class="status" id="audioStatus" data-page-node-id="0A6ApAWXKz07Uc62yvXOaK">未设置音轨。</div>
+      </div>
+    </section>
+
+    <!-- STEP 6 文案 -->
+    <section id="step6" class="hidden" data-page-node-id="eLu2AtIqjSLBmaWDqKPinS">
+      <div class="card" data-page-node-id="BOkd7kkxDyKOY34rsrb5ct">
+        <h2 data-page-node-id="pvuM87kUc7UmQbIb4D8CVl">⑥ 文案 / 字幕 <span class="pill free" data-page-node-id="hmsAI9rGslUW3WCs6hanA2">免费</span></h2>
+        <p class="desc" data-page-node-id="aqQHkWaA9blms9taCAvYtC">在画面叠加字幕或卖点文案，支持多语种与位置调整。相当于「擦除原文案 + 重排新文案」的免费实现。</p>
+        <label data-page-node-id="GUATntannunZqUMsLTRSHj">字幕文字</label>
+        <input type="text" id="subText" placeholder="例如：工厂直供 · 7 天打样" data-page-node-id="x5Bp47CFcR4mA9ZkVVBMuG" />
+        <label data-page-node-id="loColdf94NtgUzudSWH53a">字号 <span id="subSizeVal" data-page-node-id="crmyGMuAE0tVD1WIBqVZxE">36</span></label>
+        <input type="range" id="subSize" min="16" max="80" value="36" data-page-node-id="2MYarUknvUeC6WXHEpMHOf" />
+        <label data-page-node-id="JANqps7A1BYMKhoD9mTnBK">颜色</label>
+        <div class="row" data-page-node-id="zSskGLCI09qUlysbPZ99IF">
+          <input type="color" id="subColor" value="#ffffff" style="width:48px;height:34px;padding:2px;" data-page-node-id="MObeSO5U7TGKQgxN8kgrmH" />
+          <input type="text" id="subStroke" value="#000000" style="width:80px;" title="描边色" data-page-node-id="b5BFPf9Y6ZAuvE3dt7487W" />
+        </div>
+        <label data-page-node-id="ZFxoEzHAQQUFApwQXbbAYG">位置</label>
+        <div class="seg" style="max-width:320px;" data-page-node-id="22wNLcfzjQxcxMjJVNORH6">
+          <button id="posTop" data-page-node-id="KztjFLBOVE49MG9yhCcKgz">上</button>
+          <button id="posMid" data-page-node-id="q34tjKKkMmG1odYCvyrTnb">中</button>
+          <button id="posBot" class="on" data-page-node-id="SMJSEiVOZBDJypOvbUiz1F">下</button>
+        </div>
+        <div class="seg" style="max-width:320px;" data-page-node-id="R7CHkraiA20nbRFUcSUIoL">
+          <button id="alL" data-page-node-id="j3jgwHsi8mXTGKq0vzD5AL">左</button>
+          <button id="alC" class="on" data-page-node-id="iTPZCghu8Q1EFFe2ut3khu">中</button>
+          <button id="alR" data-page-node-id="6MODCGI0s205egSYF5oB8w">右</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- STEP 7 导出 -->
+    <section id="step7" class="hidden" data-page-node-id="59zdhajL4DCzgAa8ro6BjG">
+      <div class="card" data-page-node-id="KAHDtKdrCjLyyulMxf6syl">
+        <h2 data-page-node-id="FuObTdRHWMpzbhAN4UEQll">⑦ 导出 <span class="pill free" data-page-node-id="GecpTOag8wLRtBF9Ev3wS9">免费</span></h2>
+        <p class="desc" data-page-node-id="brG5Gj73NtfyXXopJymYkK">图片即时导出 PNG；视频用 ffmpeg.wasm（浏览器内）逐帧合成后编码。多平台一键出对应比例。</p>
+        <label data-page-node-id="OgneHTs3the6Lnlla8qZdD">导出比例</label>
+        <div class="row" data-page-node-id="VPEpRlz5TsYFc2ndEGX7Hd">
+          <select id="exportSize" style="width:auto;" data-page-node-id="Q0fDdDvlzXddPRd608dwHX">
+            <option value="9:16" data-page-node-id="RH0zqbYl5ZZtNjsvzNqdhH">9:16 竖屏（抖音/视频号/Reels）</option>
+            <option value="1:1" data-page-node-id="CNzHFna0sVA2nbGy5iPgOF">1:1 方图（小红书/社媒）</option>
+            <option value="16:9" data-page-node-id="fsTmayAfx1Ik8ITFJ0tTtG">16:9 横屏</option>
+            <option value="orig" data-page-node-id="DvB6mIMYDa8CyFyIkNS1d1">原始比例</option>
+          </select>
+        </div>
+        <div class="row" data-page-node-id="lUQeV38uGC5rAAfjEuTY7w">
+          <button id="btnExportImg" class="primary" data-page-node-id="hj0goAkvGZXWkUov45gCtG">导出图片 PNG</button>
+          <button id="btnExportVid" class="primary" data-page-node-id="KEUHskcXZ0FqrgFdOlGzFu">导出视频（ffmpeg.wasm）</button>
+        </div>
+        <div class="status" id="exportStatus" data-page-node-id="wOBviAlskPDhGnujnEExNp"></div>
+        <div class="kv" id="captionOut" style="margin-top:10px;white-space:pre-wrap;" data-page-node-id="cIhfKyHyLHIyo9WzsyYMqV"></div>
+      </div>
+    </section>
+
+    <!-- 预览舞台 -->
+    <div class="card" id="previewCard" data-page-node-id="FgbFExjF2e7q16K9N1nTN7">
+      <h2 data-page-node-id="LDFACg9Kamg4HcIXhsG2SY">实时预览</h2>
+      <div class="stage" data-page-node-id="UW16q5DNAdvChfpgf5Ujt3">
+        <div class="canvas-box" id="canvasBox" data-page-node-id="Po9CSUjuCI1Rkzvyv6ZBE6">
+          <div class="placeholder" id="ph" data-page-node-id="SCOGiQD634OGzd5ZkPYva0">导入素材后在此预览</div>
+          <canvas id="cv" class="hidden" data-page-node-id="BK6AYxhktvFlbHupJwBwpe"></canvas>
+        </div>
+        <div class="side" data-page-node-id="fdZ1yrBLUVN8aafTaVyFK0">
+          <div class="kv" id="metaBox" data-page-node-id="PLEAjk2MXPGYyyxmt5nSCd">—</div>
+          <hr style="border:none;border-top:1px solid var(--line);margin:12px 0;" data-page-node-id="fDuVAu3PkPzHsvSzGgVGF5" />
+          <div class="small" data-page-node-id="dBxD9sa3WYFG5nMQGnrfcC">操作提示：<br data-page-node-id="mFEpmrptq6UEg2CocruY5c">· 第 3 步在画面上拖拽框选<br data-page-node-id="uUFOCDHPr9z2dFqUuq9Svu">· 第 4 步可拖动产品图<br data-page-node-id="03Tlgr9GrmUxwG1HDxLtg3">· 所有修改实时反映在此</div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<video id="srcVideo" class="hidden-video" playsinline muted data-page-node-id="1SQ9ETWzS83L0EPY9SeR06"></video>
+
+<script>
+(function(){
+  "use strict";
+  const $ = id => document.getElementById(id);
+  const cv = $('cv'), ctx = cv.getContext('2d');
+  const MAXSIDE = 1280;
+
+  const state = {
+    kind:null,            // 'image' | 'video'
+    baseImg:null,         // HTMLImageElement
+    video:null,           // HTMLVideoElement
+    naturalW:0, naturalH:0,
+    plat:'douyin',
+    selection:null,       // {x,y,w,h} in canvas px
+    fgRegion:null,        // region kept as foreground over new bg
+    tool:'box',
+    brushMask:null,       // offscreen canvas for brush (not used heavily)
+    product:null,         // {img,x,y,scale,rot}
+    bgImg:null,
+    subtitle:{text:'',size:36,color:'#ffffff',stroke:'#000000',v:'bot',h:'c'},
+    voFile:null,
+    source:null,          // 'local' | 'link'
+    scaleFactor:1         // canvas px per natural px
+  };
+
+  // ---------- step nav ----------
+  document.querySelectorAll('nav .step').forEach(s=>{
+    s.addEventListener('click',()=>goStep(+s.dataset.step));
+  });
+  function goStep(n){
+    document.querySelectorAll('nav .step').forEach(s=>s.classList.toggle('active',+s.dataset.step===n));
+    for(let i=1;i<=7;i++) $('step'+i).classList.toggle('hidden',i!==n);
+    if(n>=2) render();
+  }
+
+  // ---------- platform ----------
+  document.querySelectorAll('.plat').forEach(b=>{
+    b.addEventListener('click',()=>{
+      document.querySelectorAll('.plat').forEach(x=>x.classList.remove('on'));
+      b.classList.add('on'); state.plat=b.dataset.plat;
+    });
+  });
+
+  // ---------- import source: local vs link ----------
+  const srcLocal=$('srcLocal'), srcLink=$('srcLink'), localPane=$('localPane'), linkPane=$('linkPane');
+  srcLocal.addEventListener('click',()=>{ srcLocal.classList.add('on'); srcLink.classList.remove('on'); localPane.classList.remove('hidden'); linkPane.classList.add('hidden'); });
+  srcLink.addEventListener('click',()=>{ srcLink.classList.add('on'); srcLocal.classList.remove('on'); linkPane.classList.remove('hidden'); localPane.classList.add('hidden'); });
+
+  function detectPlat(u){
+    if(/douyin|tiktok/.test(u)) return 'douyin';
+    if(/kuaishou/.test(u)) return 'kuaishou';
+    if(/xiaohongshu|xhslink/.test(u)) return 'xhs';
+    if(/weixin|channels/.test(u)) return 'shipinhao';
+    return null;
+  }
+  function setPlat(p){
+    document.querySelectorAll('.plat').forEach(x=>x.classList.toggle('on',x.dataset.plat===p));
+    state.plat=p;
+  }
+  $('urlInput').addEventListener('input',e=>{
+    const p=detectPlat(e.target.value.trim());
+    $('linkPlatHint').textContent='平台：'+(p?platName(p):'自动识别 / 直链');
+  });
+
+  $('btnParse').addEventListener('click',async()=>{
+    const raw=$('urlInput').value.trim();
+    if(!raw){ $('importInfo').innerHTML='<span class="status">请先粘贴视频链接。</span>'; return; }
+    state.source='link';
+    const p=detectPlat(raw);
+    if(p){ setPlat(p); $('linkPlatHint').textContent='平台：'+platName(p); }
+    const base=$('parserUrl').value.trim().replace(/\/+$/,'') || (location.protocol.indexOf('http')===0?location.origin:'');
+    $('importInfo').innerHTML='<span class="pill">解析中…</span>';
+    try{
+      let mediaUrl=raw;
+      if(p){
+        if(!base){
+          $('importInfo').innerHTML='<span class="status">该平台短链需填「解析/代理服务地址」（部署后的域名）才能拿到直链。可暂时改用平台公开 CDN 的 mp4 直链。</span>';
+          return;
+        }
+        const r=await fetch(base+'/parse?url='+encodeURIComponent(raw),{mode:'cors'});
+        const j=await r.json();
+        if(j.error) throw new Error(j.error);
+        mediaUrl=(j&&(j.url||j.video_url||j.video||j.data))||raw;
+      }
+      // 若配置了服务地址，统一经其代理转发视频（解除跨域，才能逐帧编辑）；否则直连
+      const loadUrl = base ? (base+'/proxy?url='+encodeURIComponent(mediaUrl)) : mediaUrl;
+      loadVideoBySrc(loadUrl);
+    }catch(err){
+      $('importInfo').innerHTML='<span class="status">解析失败：'+err.message+'</span>';
+    }
+  });
+
+  function loadVideoBySrc(src){
+    state.kind='video';
+    const v=document.createElement('video');
+    v.crossOrigin='anonymous'; v.muted=true; v.playsInline=true;
+    v.addEventListener('loadeddata',()=>{
+      state.video=v;
+      v.currentTime=0;
+      v.addEventListener('seeked',()=>{
+        const c=document.createElement('canvas'); c.width=v.videoWidth; c.height=v.videoHeight;
+        try{
+          c.getContext('2d').drawImage(v,0,0);
+          const framed=document.createElement('img'); framed.src=c.toDataURL();
+          framed.onload=()=>{ state.baseImg=framed; setupCanvas(); afterLoad(); };
+        }catch(e){
+          $('ph').classList.remove('hidden'); cv.classList.add('hidden');
+          $('ph').innerHTML='⚠️ 该视频已加载但<b>跨域受限</b>，浏览器禁止逐帧编辑（抠图/换背景/字幕）。<br>可播放预览；请改用：① 本地文件；② 平台公开 CDN 且允许跨域（CORS）的 mp4 直链。';
+          $('importInfo').innerHTML='<span class="pill byok">跨域受限</span>';
+        }
+      },{once:true});
+    });
+    v.addEventListener('error',()=>{ $('importInfo').innerHTML='<span class="status">视频加载失败：链接失效、需登录或跨域被拦截。</span>'; });
+    v.src=src;
+  }
+
+  // ---------- import ----------
+  const drop=$('drop'), fi=$('fileInput');
+  drop.addEventListener('click',()=>fi.click());
+  drop.addEventListener('dragover',e=>{e.preventDefault();drop.style.borderColor='var(--accent)';});
+  drop.addEventListener('dragleave',()=>drop.style.borderColor='var(--line2)');
+  drop.addEventListener('drop',e=>{e.preventDefault();if(e.dataTransfer.files[0])loadFile(e.dataTransfer.files[0]);});
+  fi.addEventListener('change',e=>{if(e.target.files[0])loadFile(e.target.files[0]);});
+
+  function loadFile(file){
+    const url=URL.createObjectURL(file);
+    if(file.type.startsWith('video')){
+      state.kind='video';
+      const v=document.createElement('video');
+      v.src=url; v.muted=true; v.playsInline=true;
+      v.addEventListener('loadeddata',()=>{
+        state.video=v;
+        v.currentTime=0;
+        v.addEventListener('seeked',()=>{
+          const img=document.createElement('canvas');
+          img.width=v.videoWidth; img.height=v.videoHeight;
+          img.getContext('2d').drawImage(v,0,0);
+          const framed=document.createElement('img');
+          framed.src=img.toDataURL();
+          framed.onload=()=>{ state.baseImg=framed; setupCanvas(); afterLoad(); };
+        },{once:true});
+      });
+    } else {
+      state.kind='image';
+      const img=new Image();
+      img.onload=()=>{ state.baseImg=img; setupCanvas(); afterLoad(); };
+      img.src=url;
+    }
+  }
+  function setupCanvas(){
+    let w=state.baseImg.width, h=state.baseImg.height;
+    const r=Math.min(1,MAXSIDE/Math.max(w,h));
+    state.scaleFactor=r;
+    cv.width=Math.round(w*r); cv.height=Math.round(h*r);
+    state.naturalW=w; state.naturalH=h;
+  }
+  function afterLoad(){
+    $('ph').classList.add('hidden'); cv.classList.remove('hidden');
+    const srcLabel = state.source==='link'?'链接':'本地';
+    $('importInfo').innerHTML = '<span class="pill free">已导入·'+srcLabel+'</span> <span class="kv">'+
+      (state.kind==='video'?'视频':'图片')+' · '+state.naturalW+'×'+state.naturalH+'</span>';
+    updateMeta();
+    goStep(2);
+    render();
+  }
+
+  // ---------- detect (demo heuristic) ----------
+  $('btnDetect').addEventListener('click',()=>{
+    const w=cv.width,h=cv.height;
+    const cands=[
+      {name:'人物（V2 支持）',x:w*0.32,y:h*0.12,w:w*0.36,h:h*0.5,demo:true},
+      {name:'手持产品',x:w*0.4,y:h*0.45,w:w*0.22,h:h*0.32},
+      {name:'背景',x:w*0.05,y:h*0.05,w:w*0.9,h:h*0.4},
+      {name:'字幕/文案',x:w*0.15,y:h*0.82,w:w*0.7,h:h*0.12}
+    ];
+    const list=$('objList'); list.innerHTML='';
+    cands.forEach((c,i)=>{
+      const div=document.createElement('div'); div.className='obj';
+      div.innerHTML='<span class="pill '+(c.demo?'byok':'free')+'">'+(c.demo?'V2':'可换')+'</span> '+c.name;
+      div.addEventListener('click',()=>{
+        state.selection={x:Math.round(c.x),y:Math.round(c.y),w:Math.round(c.w),h:Math.round(c.h)};
+        goStep(3); drawSelStatus();
+      });
+      list.appendChild(div);
+    });
+    render();
+  });
+
+  // ---------- extract keyframes (real parse) ----------
+  $('btnKeyframes').addEventListener('click',()=>{
+    if(state.kind!=='video'||!state.video){ $('kfRow').innerHTML='<span class="status">请先导入视频。</span>'; return; }
+    const src=state.video.currentSrc||state.video.src;
+    const dur=state.video.duration||0;
+    if(!dur){ $('kfRow').innerHTML='<span class="status">视频时长读取失败，无法抽帧。</span>'; return; }
+    const n=6;
+    const row=$('kfRow'); row.innerHTML='<span class="status">采集中…</span>';
+    const probe=document.createElement('video');
+    probe.crossOrigin='anonymous'; probe.muted=true; probe.preload='auto'; probe.src=src;
+    const frames=[];
+    function step(i){
+      if(i>=n){ finish(); return; }
+      const t=Math.min(dur*(i+0.5)/n, Math.max(0,dur-0.05));
+      const onSeek=()=>{
+        probe.removeEventListener('seeked',onSeek);
+        const W=probe.videoWidth,H=probe.videoHeight;
+        const full=document.createElement('canvas'); full.width=W; full.height=H;
+        const thumb=document.createElement('canvas'); thumb.width=Math.min(200,W); thumb.height=Math.max(1,Math.round(thumb.width*H/W));
+        try{
+          full.getContext('2d').drawImage(probe,0,0,W,H);
+          thumb.getContext('2d').drawImage(probe,0,0,thumb.width,thumb.height);
+          frames.push({t,thumb:thumb.toDataURL(),full:full.toDataURL()});
+        }catch(e){ frames.push({t,err:true}); }
+        step(i+1);
+      };
+      probe.addEventListener('seeked',onSeek,{once:true});
+      if(probe.readyState>=1) probe.currentTime=t;
+      else probe.addEventListener('loadeddata',()=>probe.currentTime=t,{once:true});
+    }
+    probe.addEventListener('error',()=>{ row.innerHTML='<span class="status">视频加载失败（链接失效或跨域被拦截）。请改用本地文件或允许 CORS 的直链。</span>'; });
+    step(0);
+    function finish(){
+      const s=row.querySelector('.status'); if(s)s.remove();
+      if(frames.every(f=>f.err)){ row.innerHTML='<span class="status">该视频跨域受限，无法逐帧编辑。请换本地文件或允许 CORS 的直链。</span>'; return; }
+      frames.forEach(f=>{
+        const btn=document.createElement('button'); btn.style.cssText='padding:2px;width:84px;background:#fff;border:1px solid var(--line);border-radius:8px;cursor:pointer;';
+        if(f.err){ btn.innerHTML='<div style="width:80px;height:120px;background:#f0f0f0;display:flex;align-items:center;justify-content:center;font-size:10px;color:#aaa;border-radius:6px;">受限</div>'; }
+        else{
+          btn.innerHTML='<img src="'+f.thumb+'" style="width:80px;border-radius:6px;display:block;"><div class="small" style="text-align:center">'+f.t.toFixed(1)+'s</div>';
+          btn.addEventListener('click',()=>{
+            const im=new Image(); im.onload=()=>{ state.baseImg=im; setupCanvas(); render(); };
+            im.src=f.full;
+          });
+        }
+        row.appendChild(btn);
+      });
+    }
+  });
+
+  // ---------- select tool ----------
+  $('toolBox').addEventListener('click',()=>setTool('box'));
+  $('toolBrush').addEventListener('click',()=>setTool('brush'));
+  function setTool(t){
+    state.tool=t;
+    $('toolBox').classList.toggle('on',t==='box');
+    $('toolBrush').classList.toggle('on',t==='brush');
+    cv.style.cursor = t==='box'?'crosshair':'cell';
+  }
+  let drawing=false,start=null;
+  cv.addEventListener('pointerdown',e=>{
+    if(state.tool!=='box'||!state.baseImg) return;
+    const p=toCanvas(e);
+    if(state.product){ const pr=prodRect(); if(p.x>=pr.x&&p.x<=pr.x+pr.w&&p.y>=pr.y&&p.y<=pr.y+pr.h) return; }
+    drawing=true; start=p;
+    state.selection={x:p.x,y:p.y,w:0,h:0};
+    cv.setPointerCapture(e.pointerId);
+  });
+  cv.addEventListener('pointermove',e=>{
+    if(!drawing) return;
+    const p=toCanvas(e);
+    state.selection={x:Math.min(start.x,p.x),y:Math.min(start.y,p.y),
+      w:Math.abs(p.x-start.x),h:Math.abs(p.y-start.y)};
+    render();
+  });
+  cv.addEventListener('pointerup',()=>{ drawing=false; drawSelStatus(); });
+
+  // product drag
+  let dragProd=false,dpOff=null;
+  cv.addEventListener('pointerdown',e=>{
+    if(state.tool!=='box'||!state.product) return;
+    const p=toCanvas(e);
+    const pr=prodRect();
+    if(p.x>=pr.x&&p.x<=pr.x+pr.w&&p.y>=pr.y&&p.y<=pr.y+pr.h){
+      dragProd=true; dpOff={x:p.x-state.product.x,y:p.y-state.product.y};
+      cv.setPointerCapture(e.pointerId);
+    }
+  });
+  cv.addEventListener('pointermove',e=>{
+    if(!dragProd) return;
+    const p=toCanvas(e); state.product.x=p.x-dpOff.x; state.product.y=p.y-dpOff.y; render();
+  });
+  cv.addEventListener('pointerup',()=>dragProd=false);
+
+  function toCanvas(e){
+    const r=cv.getBoundingClientRect();
+    return {x:(e.clientX-r.left)*(cv.width/r.width), y:(e.clientY-r.top)*(cv.height/r.height)};
+  }
+  function drawSelStatus(){
+    if(state.selection&&state.selection.w>4&&state.selection.h>4)
+      $('selStatus').textContent='已框选：'+Math.round(state.selection.w)+'×'+Math.round(state.selection.h)+' px（画布坐标）';
+    else $('selStatus').textContent='选区过小或为空。';
+  }
+  $('btnUseFg').addEventListener('click',()=>{
+    if(state.selection&&state.selection.w>4){ state.fgRegion={...state.selection}; $('selStatus').textContent='已设为前景区域（换背景时保留）。'; render(); }
+  });
+  $('btnClearSel').addEventListener('click',()=>{ state.selection=null; state.fgRegion=null; $('selStatus').textContent='已清除。'; render(); });
+
+  // ---------- product / bg ----------
+  $('productInput').addEventListener('change',e=>{
+    const f=e.target.files[0]; if(!f) return;
+    const img=new Image(); img.onload=()=>{
+      state.product={img,x:cv.width/2,y:cv.height/2,scale:100,rot:0};
+      render();
+    }; img.src=URL.createObjectURL(f);
+  });
+  $('scale').addEventListener('input',e=>{ if(state.product){state.product.scale=+e.target.value; $('scaleVal').textContent=e.target.value+'%'; render();} });
+  $('rot').addEventListener('input',e=>{ if(state.product){state.product.rot=+e.target.value*Math.PI/180; $('rotVal').textContent=e.target.value+'°'; render();} });
+  $('btnFitSel').addEventListener('click',()=>{
+    if(!state.product||!state.selection) return;
+    const s=state.selection;
+    const sw=s.w/state.product.img.width*100;
+    state.product.scale=Math.max(20,Math.min(300,sw));
+    $('scale').value=Math.round(state.product.scale); $('scaleVal').textContent=Math.round(state.product.scale)+'%';
+    state.product.x=s.x+s.w/2; state.product.y=s.y+s.h/2;
+    render();
+  });
+  $('btnProductClear').addEventListener('click',()=>{ state.product=null; render(); });
+  $('bgInput').addEventListener('change',e=>{
+    const f=e.target.files[0]; if(!f) return;
+    const img=new Image(); img.onload=()=>{ state.bgImg=img; render(); }; img.src=URL.createObjectURL(f);
+  });
+  $('btnBgClear').addEventListener('click',()=>{ state.bgImg=null; render(); });
+
+  // AI BYOK (reserved)
+  $('btnAiReplace').addEventListener('click',()=>{
+    const k=$('apiKey').value.trim();
+    $('aiStatus').textContent = k
+      ? '已填写 Key（'+(k.slice(0,4)+'…'+k.slice(-2))+'）。需配套 Cloudflare Worker 代理转发才能真实调用，V1 未内置后端。'
+      : '请先填写 API Key。该能力需自建 Worker 代理，V1 不内置服务端。';
+  });
+
+  // ---------- audio ----------
+  function fillVoices(){
+    const langs={};
+    speechSynthesis.getVoices().forEach(v=>{
+      const opt=document.createElement('option'); opt.value=v.voiceURI; opt.textContent=v.name+' ('+v.lang+')';
+      $('ttsVoice').appendChild(opt);
+    });
+    const common=[['zh-CN','中文'],['en-US','English'],['ja-JP','日本語'],['ko-KR','한국어']];
+    common.forEach(([c,n])=>{ const o=document.createElement('option'); o.value=c; o.textContent=n; $('ttsLang').appendChild(o); });
+  }
+  if('speechSynthesis' in window){ fillVoices(); speechSynthesis.onvoiceschanged=fillVoices; }
+  else { $('ttsLang').innerHTML='<option>浏览器不支持 Web Speech</option>'; }
+  $('btnTts').addEventListener('click',()=>{
+    const txt=$('ttsText').value.trim(); if(!txt) return;
+    const u=new SpeechSynthesisUtterance(txt);
+    const vv=[...$('ttsVoice').options].find(o=>o.value===$('ttsVoice').value);
+    if(vv) { const voice=speechSynthesis.getVoices().find(x=>x.voiceURI===vv.value); if(voice)u.voice=voice; }
+    speechSynthesis.cancel(); speechSynthesis.speak(u);
+  });
+  $('btnTtsStop').addEventListener('click',()=>speechSynthesis.cancel());
+  $('voInput').addEventListener('change',e=>{
+    if(e.target.files[0]){ state.voFile=e.target.files[0]; $('audioStatus').textContent='已载入音轨：'+e.target.files[0].name; }
+  });
+
+  // ---------- subtitle ----------
+  $('subText').addEventListener('input',e=>{ state.subtitle.text=e.target.value; render(); });
+  $('subSize').addEventListener('input',e=>{ state.subtitle.size=+e.target.value; $('subSizeVal').textContent=e.target.value; render(); });
+  $('subColor').addEventListener('input',e=>{ state.subtitle.color=e.target.value; render(); });
+  $('subStroke').addEventListener('input',e=>{ state.subtitle.stroke=e.target.value; render(); });
+  [['posTop','top'],['posMid','mid'],['posBot','bot']].forEach(([id,v])=>$(id).addEventListener('click',()=>{
+    ['posTop','posMid','posBot'].forEach(x=>$(x).classList.remove('on')); $(id).classList.add('on'); state.subtitle.v=v; render();
+  }));
+  [['alL','l'],['alC','c'],['alR','r']].forEach(([id,h])=>$(id).addEventListener('click',()=>{
+    ['alL','alC','alR'].forEach(x=>$(x).classList.remove('on')); $(id).classList.add('on'); state.subtitle.h=h; render();
+  }));
+
+  // ---------- render pipeline ----------
+  function render(){
+    if(!state.baseImg) return;
+    const w=cv.width,h=cv.height;
+    ctx.clearRect(0,0,w,h);
+    if(state.bgImg){ drawCover(state.bgImg,w,h); }
+    else { ctx.drawImage(state.baseImg,0,0,w,h); }
+    if(state.bgImg && state.fgRegion){
+      const f=state.fgRegion;
+      ctx.save();
+      ctx.beginPath(); ctx.rect(f.x,f.y,f.w,f.h); ctx.clip();
+      ctx.drawImage(state.baseImg,0,0,w,h);
+      ctx.restore();
+    }
+    if(state.product){ drawProduct(); }
+    if(state.subtitle.text){ drawSubtitle(); }
+    if(state.selection && state.selection.w>2 && (state.tool==='box')) drawSelBox();
+  }
+  function drawCover(img,w,h){
+    const r=Math.max(w/img.width,h/img.height);
+    const nw=img.width*r, nh=img.height*r;
+    ctx.drawImage(img,(w-nw)/2,(h-nh)/2,nw,nh);
+  }
+  function drawProduct(){
+    const p=state.product;
+    const s=p.scale/100;
+    const pw=p.img.width*s, ph=p.img.height*s;
+    ctx.save();
+    ctx.translate(p.x,p.y); ctx.rotate(p.rot);
+    ctx.drawImage(p.img,-pw/2,-ph/2,pw,ph);
+    ctx.restore();
+  }
+  function prodRect(){
+    const p=state.product, s=p.scale/100;
+    const pw=p.img.width*s, ph=p.img.height*s;
+    return {x:p.x-pw/2,y:p.y-ph/2,w:pw,h:ph};
+  }
+  function drawSubtitle(){
+    const s=state.subtitle; const fs=s.size;
+    ctx.font='600 '+fs+'px -apple-system,"PingFang SC","Microsoft YaHei",sans-serif';
+    ctx.textBaseline='middle';
+    let x=cv.width/2, y;
+    if(s.h==='l') x=fs; else if(s.h==='r') x=cv.width-fs;
+    ctx.textAlign = s.h==='l'?'left':(s.h==='r'?'right':'center');
+    if(s.v==='top') y=fs+12; else if(s.v==='mid') y=cv.height/2; else y=cv.height-fs-16;
+    ctx.lineWidth=Math.max(2,fs/12); ctx.strokeStyle=s.stroke; ctx.fillStyle=s.color;
+    ctx.strokeText(s.text,x,y); ctx.fillText(s.text,x,y);
+  }
+  function drawSelBox(){
+    const f=state.selection;
+    ctx.save();
+    ctx.setLineDash([8,6]); ctx.lineWidth=2; ctx.strokeStyle='#534ab7';
+    ctx.strokeRect(f.x,f.y,f.w,f.h);
+    ctx.restore();
+  }
+  function updateMeta(){
+    $('metaBox').innerHTML='类型：'+(state.kind==='video'?'视频（首帧）':'图片')+'<br>分辨率：'+state.naturalW+'×'+state.naturalH+
+      '<br>来源：'+(state.source==='link'?'视频链接':'本地文件')+'<br>平台：'+platName(state.plat);
+  }
+  function platName(p){return {douyin:'抖音',kuaishou:'快手',xhs:'小红书',shipinhao:'视频号'}[p]||p;}
+
+  // ---------- export ----------
+  $('btnExportImg').addEventListener('click',()=>{
+    const {tw,th}=targetSize();
+    const out=document.createElement('canvas'); out.width=tw; out.height=th;
+    const octx=out.getContext('2d');
+    octx.drawImage(cv,0,0,cv.width,cv.height,0,0,tw,th);
+    out.toBlob(b=>{ download(b,'replace_'+state.plat+'.png'); },'image/png');
+    $('exportStatus').textContent='已导出 PNG ('+tw+'×'+th+')。';
+    showCaption();
+  });
+
+  $('btnExportVid').addEventListener('click',async()=>{
+    if(state.kind!=='video'){ $('exportStatus').textContent='当前为图片，请用「导出图片」。'; return; }
+    $('exportStatus').textContent='视频逐帧编码为本雏形预留能力：需在浏览器内接入 ffmpeg.wasm（联网 + 足够内存）逐帧合成后封装。当前先导出当前合成帧 PNG，完整编码可在此基础上接 Worker 实现。';
+    cv.toBlob(b=>download(b,'frame_current.png'),'image/png');
+  });
+  function targetSize(){
+    const aspect=$('exportSize').value;
+    if(aspect==='orig') return {tw:cv.width,th:cv.height};
+    const map={'9:16':[1080,1920],'1:1':[1080,1080],'16:9':[1920,1080]};
+    return {tw:map[aspect][0],th:map[aspect][1]};
+  }
+  function showCaption(){
+    const tmpl={
+      douyin:'#抖音 #好物推荐 #工厂直供\n标题：源头工厂 | 同款这里拿货',
+      kuaishou:'#快手 #带货 #源头好货\n标题：厂家直发 性价比拉满',
+      xhs:'#小红书 #种草 #好物分享\n标题：挖到宝了｜这件真的可以冲',
+      shipinhao:'#视频号 #好物 #创业\n标题：源头好货 一件也是批发价'
+    };
+    $('captionOut').textContent='— 发布文案（复制后手动粘贴到对应 App）—\n'+(tmpl[state.plat]||'');
+  }
+  function download(blob,name){
+    const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=name; a.click();
+    setTimeout(()=>URL.revokeObjectURL(a.href),2000);
+  }
+  function dataURLtoBlob(d){ const a=d.split(','),m=a[0].match(/:(.*?);/)[1],b=atob(a[1]);
+    const u=new Uint8Array(b.length); for(let i=0;i<b.length;i++)u[i]=b.charCodeAt(i);
+    return new Blob([u],{type:m}); }
+
+  render();
+})();
+</script>
+</body>
+</html>
