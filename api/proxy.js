@@ -8,7 +8,7 @@
 // 免费额度注意：Vercel 函数响应有体积限制，过长视频可能超限；
 // 如需稳定处理大视频，建议改用 Render/Railway 或 Cloudflare Pages（已支持流式）。
 
-export const config = { runtime: 'nodejs20.x' };
+export const config = { runtime: 'nodejs' };
 
 import { Readable } from 'stream';
 
