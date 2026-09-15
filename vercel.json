@@ -2,5 +2,9 @@
   "functions": {
     "api/parse.js": { "maxDuration": 30 },
     "api/proxy.js": { "maxDuration": 30 }
-  }
+  },
+  "rewrites": [
+    { "source": "/parse", "destination": "/api/parse" },
+    { "source": "/proxy", "destination": "/api/proxy" }
+  ]
 }
